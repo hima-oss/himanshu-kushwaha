@@ -1,0 +1,108 @@
+/*
+    ---------------------------------------------------------------------
+    Himanshu Kushwaha Professional Portfolio - CSS Styles
+    
+    A clean, minimal, and luxury design for a personal portfolio website.
+    ---------------------------------------------------------------------
+*/
+
+/* 1. Base & Global Styles */
+html {
+    scroll-behavior: smooth;
+}
+
+body {
+    font-family: 'Inter', sans-serif;
+    background-color: #f7f3f0; /* Soft, warm off-white */
+    color: #333333; /* Dark gray for elegant contrast */
+    line-height: 1.6;
+}
+
+/* 2. Typography */
+.font-serif {
+    font-family: 'Playfair Display', serif;
+}
+
+.font-sans {
+    font-family: 'Inter', sans-serif;
+}
+
+h1, h2, h3 {
+    letter-spacing: -0.025em; /* Tight letter spacing for a modern feel */
+}
+
+/* 3. Header & Navigation */
+.header-nav {
+    background-color: rgba(255, 255, 255, 0.9); /* Semi-transparent white */
+    backdrop-filter: blur(10px); /* Glassmorphism effect */
+    -webkit-backdrop-filter: blur(10px);
+}
+
+.header-link {
+    transition: color 0.3s ease, border-color 0.3s ease;
+}
+
+.header-link:hover {
+    color: #000000;
+    border-bottom: 2px solid #000000;
+}
+
+/* 4. Hero Section */
+.hero-section {
+    position: relative;
+    overflow: hidden;
+    min-height: 100vh;
+}
+
+.hero-overlay {
+    background-color: rgba(0, 0, 0, 0.4); /* Dark overlay for image contrast */
+}
+
+.hero-text {
+    z-index: 10;
+}
+
+.cta-button {
+    border: 2px solid #ffffff;
+    transition: all 0.4s ease;
+}
+
+.cta-button:hover {
+    background-color: #ffffff;
+    color: #000000;
+}
+
+/* 5. Team/About Section */
+.profile-image {
+    box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+}
+
+.about-details p {
+    margin-bottom: 1rem;
+}
+
+/* 6. Work/Gallery Section */
+.work-item {
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 15px rgba(0, 0, 0, 0.05);
+}
+
+.work-item:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+}
+
+/* 7. Contact & Footer */
+.contact-button {
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
+    transition: all 0.3s ease;
+}
+
+.contact-button:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(0, 0, 0, 0.15);
+}
+
+.footer-section {
+    background-color: #1a1a1a;
+}

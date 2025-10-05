@@ -1,0 +1,389 @@
+<!DOCTYPE html>
+<html lang="hi">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SmartConverter</title>
+    <!-- Tailwind CSS CDN -->
+    <script src="https://cdn.tailwindcss.com"></script>
+    <style>
+        /* Inter font usage */
+        body {
+            font-family: 'Inter', sans-serif;
+            transition: background-color 2s ease-in-out; /* Smooth color transition */
+        }
+        /* Custom styles for the app container */
+        .app-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            padding: 2rem 1rem;
+            transition: background-color 2s ease-in-out;
+        }
+        .main-button {
+            transition: all 0.2s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        .main-button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.15);
+        }
+    </style>
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        'primary-light': '#b3e0ff',
+                        'secondary-light': '#c8a2c8',
+                        'accent-light': '#ffdd99',
+                        'teal-light': '#a7f3d0',
+                        'rose-light': '#fecaca',
+                    }
+                }
+            }
+        }
+    </script>
+</head>
+<body class="bg-gray-50">
+
+    <div id="app-container" class="app-container">
+        <!-- App Title -->
+        <h1 class="text-3xl font-extrabold mb-8 text-white p-3 rounded-xl bg-gray-900 shadow-xl">
+            SmartConverter
+        </h1>
+
+        <!-- Main Content Area -->
+        <div id="content-area" class="w-full max-w-lg bg-white p-6 rounded-2xl shadow-2xl">
+            <!-- Content will be injected here (Dashboard or Calculator View) -->
+        </div>
+
+        <!-- Notification/Result Modal -->
+        <div id="message-modal" class="fixed inset-0 bg-black bg-opacity-50 z-50 hidden items-center justify-center p-4" onclick="closeModal()">
+            <div class="bg-white p-6 rounded-xl shadow-2xl max-w-sm w-full animate-bounce" onclick="event.stopPropagation()">
+                <h3 class="text-xl font-bold mb-3 text-indigo-700">Result</h3>
+                <p id="modal-message" class="text-gray-700 mb-4"></p>
+                <button onclick="closeModal()" class="w-full bg-indigo-600 text-white py-2 rounded-lg hover:bg-indigo-700 transition">Band Karein (Close)</button>
+            </div>
+        </div>
+
+    </div>
+
+    <script>
+        // Global state to track current page
+        let currentPage = 'dashboard';
+
+        // Array of background color classes for dynamic change
+        const dynamicBgColors = [
+            'bg-primary-light',
+            'bg-secondary-light',
+            'bg-accent-light',
+            'bg-teal-light',
+            'bg-rose-light'
+        ];
+        let colorIndex = 0;
+
+        /**
+         * Har 5 second mein app container ka background color badalta hai.
+         */
+        function startColorChanger() {
+            const container = document.getElementById('app-container');
+            
+            // Remove all previous background color classes
+            container.classList.remove(...dynamicBgColors);
+            
+            // Apply the first color and start interval
+            container.classList.add(dynamicBgColors[colorIndex]);
+            
+            setInterval(() => {
+                // Remove the old color class
+                container.classList.remove(dynamicBgColors[colorIndex]);
+                
+                // Move to the next color index (loop back if needed)
+                colorIndex = (colorIndex + 1) % dynamicBgColors.length;
+                
+                // Add the new color class
+                container.classList.add(dynamicBgColors[colorIndex]);
+            }, 5000); // 5000 milliseconds = 5 seconds
+        }
+
+        /**
+         * Dashboard ke liye buttons ka data structure.
+         */
+        const features = [
+            { key: 'age_calc', title: 'Age Calculator', description: 'Janamdin se umar ginein.' },
+            { key: 'cm_meter', title: 'cm ↔ meter', description: 'Length/Duri badlein.' },
+            { key: 'bmi_calc', title: 'BMI Calculator', description: 'Body Mass Index ginein.' },
+            { key: 'kg_pound', title: 'Kg ↔ Gram ↔ Pound', description: 'Vajan/Weight badlein.' },
+            { key: 'interest', title: 'Simple / Compound Interest', description: 'Byaaj ginein.' },
+            { key: 'currency', title: 'Currency Converter', description: 'Mudrra badlein.' },
+        ];
+
+        /**
+         * Modal (message box) ko display karta hai.
+         * @param {string} message - Dikhane wala sandesh (result).
+         */
+        function showModal(message) {
+            document.getElementById('modal-message').innerHTML = message;
+            document.getElementById('message-modal').classList.remove('hidden');
+            document.getElementById('message-modal').classList.add('flex');
+        }
+
+        /**
+         * Modal (message box) ko band karta hai.
+         */
+        function closeModal() {
+            document.getElementById('message-modal').classList.add('hidden');
+            document.getElementById('message-modal').classList.remove('flex');
+        }
+
+        // --- View Rendering Functions ---
+
+        /**
+         * Main Dashboard (Home Screen) ko render karta hai.
+         */
+        function renderDashboard() {
+            currentPage = 'dashboard';
+            const contentArea = document.getElementById('content-area');
+            
+            let html = '<h2 class="text-2xl font-semibold mb-6 text-gray-800 text-center">Mukhya Dashboard (Main Features)</h2>';
+            
+            features.forEach(feature => {
+                html += `
+                    <button onclick="showPage('${feature.key}')" 
+                            class="main-button w-full p-4 mb-4 text-left bg-indigo-50 text-indigo-800 rounded-xl font-medium text-lg border border-indigo-200 block">
+                        ${feature.title} 
+                        <span class="block text-sm text-indigo-600 mt-1 opacity-75">${feature.description}</span>
+                    </button>
+                `;
+            });
+
+            html += '<p class="text-sm text-center text-gray-500 mt-6">Har 5 second mein rang badlega!</p>';
+            contentArea.innerHTML = html;
+        }
+
+        /**
+         * Ek specific calculation page ko render karta hai.
+         * @param {string} key - Calculation page ki key.
+         */
+        function showPage(key) {
+            currentPage = key;
+            const contentArea = document.getElementById('content-area');
+            const feature = features.find(f => f.key === key);
+
+            let html = `
+                <div class="mb-6">
+                    <button onclick="renderDashboard()" class="text-indigo-600 hover:text-indigo-800 flex items-center mb-4">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5 mr-1" viewBox="0 0 20 20" fill="currentColor">
+                            <path fill-rule="evenodd" d="M9.707 14.707a1 1 0 01-1.414 0l-4-4a1 1 0 010-1.414l4-4a1 1 0 011.414 1.414L7.414 9H15a1 1 0 110 2H7.414l2.293 2.293a1 1 0 010 1.414z" clip-rule="evenodd" />
+                        </svg>
+                        Dashboard Par Wapas Jayen
+                    </button>
+                    <h2 class="text-2xl font-bold text-gray-900 mb-2">${feature.title}</h2>
+                    <p class="text-gray-600 border-b pb-3 mb-4">${feature.description}</p>
+                </div>
+            `;
+            
+            // Add feature-specific calculator UI
+            switch (key) {
+                case 'age_calc':
+                    html += getAgeCalculatorUI();
+                    break;
+                case 'cm_meter':
+                    html += getCmMeterConverterUI();
+                    break;
+                case 'bmi_calc':
+                    html += getBMICalculatorUI();
+                    break;
+                case 'kg_pound':
+                    html += getKgPoundConverterUI(); // Placeholder UI
+                    break;
+                default:
+                    html += '<p class="text-red-500">Yeh feature abhi nirman adheen hai. (This feature is under construction.)</p>';
+            }
+
+            contentArea.innerHTML = html;
+        }
+
+        // --- Feature UI Templates ---
+
+        function getAgeCalculatorUI() {
+            return `
+                <div class="space-y-4">
+                    <label for="dob" class="block text-sm font-medium text-gray-700">Apni Janam Tithi Chunein (Select Date of Birth)</label>
+                    <input type="date" id="dob" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500" value="${new Date().toISOString().substring(0, 10)}">
+                    
+                    <button onclick="calculateAge()" class="w-full bg-green-600 text-white py-3 rounded-lg font-bold hover:bg-green-700 transition">Umar Ginein (Calculate Age)</button>
+                    
+                    <div id="age_result" class="mt-4 p-4 bg-gray-100 rounded-lg text-gray-800 font-semibold text-center hidden"></div>
+                </div>
+            `;
+        }
+        
+        function getCmMeterConverterUI() {
+            return `
+                <div class="space-y-4">
+                    <div class="flex space-x-2">
+                        <input type="number" id="cm_input" placeholder="Centimeters (cm)" class="w-1/2 p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                        <button onclick="convertCmToMeter()" class="w-1/2 bg-blue-600 text-white py-3 rounded-lg font-bold hover:bg-blue-700 transition">CM → Meter</button>
+                    </div>
+                    <div class="flex space-x-2">
+                        <input type="number" id="meter_input" placeholder="Meters (m)" class="w-1/2 p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                        <button onclick="convertMeterToCm()" class="w-1/2 bg-purple-600 text-white py-3 rounded-lg font-bold hover:bg-purple-700 transition">Meter → CM</button>
+                    </div>
+                    
+                    <div id="cm_meter_result" class="mt-4 p-4 bg-gray-100 rounded-lg text-gray-800 font-semibold text-center hidden"></div>
+                </div>
+            `;
+        }
+
+        function getBMICalculatorUI() {
+            return `
+                <div class="space-y-4">
+                    <div>
+                        <label for="bmi_weight" class="block text-sm font-medium text-gray-700">Vajan (Weight in Kg)</label>
+                        <input type="number" id="bmi_weight" placeholder="Kg mein vajan" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    <div>
+                        <label for="bmi_height" class="block text-sm font-medium text-gray-700">Lambai (Height in Meters)</label>
+                        <input type="number" id="bmi_height" placeholder="Meter mein lambai (e.g., 1.75)" class="w-full p-3 border border-gray-300 rounded-lg focus:ring-indigo-500 focus:border-indigo-500">
+                    </div>
+                    
+                    <button onclick="calculateBMI()" class="w-full bg-red-600 text-white py-3 rounded-lg font-bold hover:bg-red-700 transition">BMI Ginein</button>
+                    
+                    <div id="bmi_result" class="mt-4 p-4 bg-gray-100 rounded-lg text-gray-800 font-semibold text-center hidden"></div>
+                </div>
+            `;
+        }
+        
+        function getKgPoundConverterUI() {
+             return `
+                <div class="space-y-4">
+                    <p class="text-center text-orange-500 font-bold">Yeh ek complex converter hai, iska logic aur UI abhi joda ja raha hai.</p>
+                    <div id="kg_pound_result" class="mt-4 p-4 bg-gray-100 rounded-lg text-gray-800 font-semibold text-center">
+                        <p>Yahan Kg, Gram, aur Pound ka conversion hoga.</p>
+                    </div>
+                </div>
+            `;
+        }
+
+        // --- Feature Calculation Logic ---
+
+        /**
+         * Age Calculator Logic
+         */
+        function calculateAge() {
+            const dobString = document.getElementById('dob').value;
+            const dob = new Date(dobString);
+            const today = new Date();
+            
+            if (isNaN(dob.getTime())) {
+                showModal('Kripya sahi Janam Tithi chunein.');
+                return;
+            }
+
+            let age = today.getFullYear() - dob.getFullYear();
+            const monthDifference = today.getMonth() - dob.getMonth();
+            const dayDifference = today.getDate() - dob.getDate();
+
+            // Adjust age if birthday hasn't passed this year
+            if (monthDifference < 0 || (monthDifference === 0 && dayDifference < 0)) {
+                age--;
+            }
+            
+            const resultDiv = document.getElementById('age_result');
+            resultDiv.innerHTML = `Aapki umar hai: <strong class="text-2xl text-indigo-700">${age} Saal (Years)</strong>.`;
+            resultDiv.classList.remove('hidden');
+            showModal(`Aapki umar: <strong>${age} Saal</strong>.`);
+        }
+
+        /**
+         * CM to Meter Conversion Logic
+         */
+        function convertCmToMeter() {
+            const cm = parseFloat(document.getElementById('cm_input').value);
+            if (isNaN(cm) || cm < 0) {
+                showModal('Kripya CM mein sahi value daalein.');
+                return;
+            }
+            const meter = cm / 100;
+            const resultDiv = document.getElementById('cm_meter_result');
+            document.getElementById('meter_input').value = meter.toFixed(3);
+            resultDiv.innerHTML = `<strong class="text-xl text-blue-700">${cm} cm</strong> = <strong class="text-xl text-purple-700">${meter.toFixed(3)} meter</strong>`;
+            resultDiv.classList.remove('hidden');
+            showModal(`${cm} cm = ${meter.toFixed(3)} meter`);
+        }
+        
+        /**
+         * Meter to CM Conversion Logic
+         */
+        function convertMeterToCm() {
+            const meter = parseFloat(document.getElementById('meter_input').value);
+            if (isNaN(meter) || meter < 0) {
+                showModal('Kripya Meter mein sahi value daalein.');
+                return;
+            }
+            const cm = meter * 100;
+            const resultDiv = document.getElementById('cm_meter_result');
+            document.getElementById('cm_input').value = cm.toFixed(0);
+            resultDiv.innerHTML = `<strong class="text-xl text-purple-700">${meter} meter</strong> = <strong class="text-xl text-blue-700">${cm.toFixed(0)} cm</strong>`;
+            resultDiv.classList.remove('hidden');
+            showModal(`${meter} meter = ${cm.toFixed(0)} cm`);
+        }
+
+        /**
+         * BMI Calculator Logic
+         */
+        function calculateBMI() {
+            const weight = parseFloat(document.getElementById('bmi_weight').value);
+            const height = parseFloat(document.getElementById('bmi_height').value); // height in meters
+            
+            if (isNaN(weight) || isNaN(height) || weight <= 0 || height <= 0) {
+                showModal('Kripya Vajan (Kg) aur Lambai (Meter) ki sahi value daalein.');
+                return;
+            }
+
+            // BMI Formula: weight (kg) / [height (m)]^2
+            const bmi = weight / (height * height);
+            const bmiValue = bmi.toFixed(2);
+            
+            let category = '';
+            let color = '';
+
+            if (bmi < 18.5) {
+                category = 'Kam Vajan (Underweight)';
+                color = 'text-yellow-600';
+            } else if (bmi >= 18.5 && bmi <= 24.9) {
+                category = 'Normal Vajan (Healthy Weight)';
+                color = 'text-green-600';
+            } else if (bmi >= 25 && bmi <= 29.9) {
+                category = 'Zyada Vajan (Overweight)';
+                color = 'text-orange-600';
+            } else {
+                category = 'Motaapa (Obese)';
+                color = 'text-red-600';
+            }
+
+            const resultDiv = document.getElementById('bmi_result');
+            resultDiv.innerHTML = `
+                Aapka BMI: <strong class="text-2xl text-red-700">${bmiValue}</strong><br>
+                Category: <span class="font-bold ${color}">${category}</span>
+            `;
+            resultDiv.classList.remove('hidden');
+            showModal(`Aapka BMI: ${bmiValue}<br>Category: ${category}`);
+        }
+
+
+        // --- Initialization ---
+        
+        // Start the background color changer when the page loads
+        window.onload = function() {
+            startColorChanger();
+            // Load the main dashboard initially
+            renderDashboard();
+        };
+
+    </script>
+</body>
+</html>
